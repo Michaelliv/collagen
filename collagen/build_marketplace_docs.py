@@ -12,12 +12,9 @@ from collagen.common import (
     SPHINX_BUILD,
     PathIterator,
     TEMPLATES_DIR,
-    STATIC_DIR,
+    STATIC_DIR, clone_repository, render_jinja_file, exec_shell,
 )
 from collagen.files import copy_file, unlink
-from collagen.git import clone_repository
-from collagen.render_jinja import render_jinja_file
-from collagen.shell import exec_shell
 from collagen.sphinx_build import sphinx_build, SphinxKWArgs
 
 

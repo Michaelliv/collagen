@@ -1,9 +1,7 @@
 from dataclasses import asdict, dataclass
 
 from collagen.files import unlink
-from collagen.render_jinja import render_jinja_file
-from collagen.shell import exec_shell
-from collagen.common import TEMPLATES_DIR
+from collagen.common import TEMPLATES_DIR, render_jinja_file, exec_shell
 
 
 @dataclass

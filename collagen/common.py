@@ -1,8 +1,12 @@
 import hashlib
-import os
+import subprocess
 from os import PathLike
 from pathlib import Path
+from shutil import rmtree
 from typing import Callable, Optional
+
+from git import Repo
+from jinja2 import Template
 
 PROJECT_ROOT = Path().absolute()
 TEMPLATES_DIR = PROJECT_ROOT / "collagen" / "_templates"
@@ -12,20 +16,6 @@ SPHINX_API_DOC = "/home/michaell/programs/miniconda3/envs/mlrun/bin/sphinx-apido
 FUNCTIONS_DIR = Path().absolute().parent / "functions"
 DOCS_DIR = Path().absolute().parent / "docs"
 HTML_BUILD_DIR = DOCS_DIR / "_build" / "html"
-
-
-class cd:
-    """Context manager for changing the current working directory"""
-
-    def __init__(self, new_path: PathLike):
-        self.new_path = os.path.expanduser(new_path)
-
-    def __enter__(self):
-        self.saved_path = os.getcwd()
-        os.chdir(self.new_path)
-
-    def __exit__(self):
-        os.chdir(self.saved_path)
 
 
 class PathIterator:
@@ -63,3 +53,34 @@ def file_md5(path: str, buffer: int = 100_000):
                 break
             md5.update(data)
     return md5.hexdigest()
+
+
+def clone_repository(repository_path: str, target_path: str, remove_if_already_exists):
+    if Path(target_path).exists():
+        if remove_if_already_exists:
+            rmtree(target_path)
+        else:
+            raise RuntimeError(f"Target {target_path} already exists")
+    Repo.clone_from(repository_path, target_path)
+
+
+def render_jinja_file(template_path: str, output_path: str, data: dict):
+    with open(template_path, "r") as t:
+        template_text = t.read()
+
+    template = Template(template_text)
+    rendered = template.render(**data)
+
+    with open(output_path, "w") as out_t:
+        out_t.write(rendered)
+
+
+def exec_shell(*commands: str):
+    for command in commands:
+        process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE)
+        process.wait()
+
+
+def make_init_files(path_iterator: PathIterator):
+    for path in path_iterator:
+        touch(path / "__init__.py")
