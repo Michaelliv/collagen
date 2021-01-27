@@ -5,7 +5,7 @@ from typing import List
 from collagen.build_marketplace_docs import BuildMarketplaceDocs
 
 
-def main(argv: List[str] = sys.argv[1:]):
+def main(argv: List[str]):
     source = Path(argv[0])
     target = Path(argv[1])
 
@@ -17,4 +17,4 @@ def main(argv: List[str] = sys.argv[1:]):
 
 
 if __name__ == "__main__":
-    main()
+    main(sys.argv[1:])
