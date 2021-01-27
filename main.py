@@ -1,7 +1,7 @@
 import argparse
 from pathlib import Path
 
-from collagen.build_marketplace_docs import BuildMarketplaceDocs
+from build_marketplace_docs import BuildMarketplaceDocs
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()

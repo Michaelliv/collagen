@@ -2,7 +2,7 @@ import shutil
 from pathlib import Path
 from typing import List, Union
 
-from collagen.common import PathIterator, file_md5
+from common import PathIterator, file_md5
 
 
 def unlink(paths: Union[str, List[str], PathIterator], ignore_errors: bool = False):
