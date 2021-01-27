@@ -54,7 +54,7 @@
                                     </button>
                                     <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                                         {% for prev in archive["prev"] %}
-                                            <a class="dropdown-item" href="#">prev</a>
+                                            <a class="dropdown-item" href="#">{{prev}}</a>
                                         {% endfor %}
                                     </div>
                                 </div>
