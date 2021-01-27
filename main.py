@@ -1,11 +1,20 @@
+import sys
 from pathlib import Path
+from typing import List
 
 from collagen.build_marketplace_docs import BuildMarketplaceDocs
 
-if __name__ == "__main__":
-    build = BuildMarketplaceDocs(
-        source="/home/michaell/marketplace_demo/functions",
-        git_repo="https://github.com/Michaelliv/marketplace-docs.git",
-        target="/home/michaell/marketplace_demo/marketplace-docs",
-    )
+
+def main(argv: List[str] = sys.argv[1:]):
+    source = Path(argv[0])
+    target = Path(argv[1])
+
+    assert source.exists()
+    assert target.exists()
+
+    build = BuildMarketplaceDocs(source=str(source), target=str(target))
     build.build()
+
+
+if __name__ == "__main__":
+    main()

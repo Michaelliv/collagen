@@ -1,6 +1,7 @@
-mlrun==0.5.4
 Jinja2==2.11.2
+mlrun==0.5.4
 beautifulsoup4==4.9.3
 dataclasses==0.8
-GitPython==3.1.12
-PyYAML==5.4.1
+PyYAML~=5.3.1
+sphinx~=3.4.3
+sphinx-book-theme==0.0.39
