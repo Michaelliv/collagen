@@ -6,8 +6,8 @@ from collagen.build_marketplace_docs import BuildMarketplaceDocs
 
 
 def main(argv: List[str]):
-    source = Path(argv[0])
-    target = Path(argv[1])
+    source = Path(argv[0]).absolute()
+    target = Path(argv[1]).absolute()
 
     assert source.exists()
     assert target.exists()
