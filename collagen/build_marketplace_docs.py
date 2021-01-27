@@ -49,7 +49,7 @@ class BuildMarketplaceDocs:
 
     def build(self):
         # Document modules from source dir into self.temp_docs, remove temp conf.py, replace with template
-        sphinx_apidoc_cmd(f"collagen -F -o {self.temp_docs} {self.source}".split(" "))
+        sphinx_apidoc_cmd(f"-F -o {self.temp_docs} {self.source}".split(" "))
         conf_py_target = self.temp_docs + "/conf.py"
         unlink(str(conf_py_target))
         data = asdict(
@@ -67,9 +67,7 @@ class BuildMarketplaceDocs:
             unlink(self.temp_docs / f"{notebook.stem}.rst", ignore_errors=True)
             copy_file(source=str(notebook), target=str(self.temp_docs / notebook.name))
 
-        build_command = (
-            f"sphinx_build -b html {self.temp_docs} {self.temp_docs / '_build'}"
-        )
+        build_command = f"-b html {self.temp_docs} {self.temp_docs / '_build'}"
         sphinx_build_cmd(build_command.split(" "))
 
         # Copy source directories to target directories, if target already has the directory, archive previous version

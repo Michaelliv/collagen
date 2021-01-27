@@ -15,5 +15,9 @@ if __name__ == "__main__":
     assert source.exists()
     assert target.exists()
 
+    print(f"Source: {source}")
+    print(f"Target: {target}")
+
+    print(f"Starting to build marketplace docs...")
     build = BuildMarketplaceDocs(source=str(source), target=str(target))
     build.build()
