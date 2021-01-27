@@ -10,6 +10,10 @@ PROJECT_ROOT = Path().absolute()
 TEMPLATES_DIR = PROJECT_ROOT / "collagen" / "_templates"
 STATIC_DIR = PROJECT_ROOT / "collagen" / "_static"
 
+print(f"Collagen root: {PROJECT_ROOT}")
+print(f"Collagen templates: {TEMPLATES_DIR}")
+print(f"Collagen static files: {STATIC_DIR}")
+
 
 class PathIterator:
     def __init__(

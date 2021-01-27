@@ -9,11 +9,7 @@ from bs4 import BeautifulSoup
 from sphinx.cmd.build import main as sphinx_build_cmd
 from sphinx.ext.apidoc import main as sphinx_apidoc_cmd
 
-from collagen.common import (
-    PathIterator,
-    STATIC_DIR,
-)
-from collagen.common import TEMPLATES_DIR, render_jinja_file
+from collagen.common import PathIterator, STATIC_DIR, TEMPLATES_DIR, render_jinja_file
 from collagen.files import copy_file
 from collagen.files import unlink
 
