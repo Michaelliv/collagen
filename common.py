@@ -1,5 +1,6 @@
 import hashlib
 import subprocess
+from datetime import datetime
 from os import PathLike
 from pathlib import Path
 from typing import Callable, Optional
@@ -59,7 +60,7 @@ def render_jinja_file(template_path: str, output_path: str, data: dict):
     template = Template(template_text)
     rendered = template.render(**data)
 
-    with open(output_path, "w") as out_t:
+    with open(output_path, "w+") as out_t:
         out_t.write(rendered)
 
 
@@ -72,3 +73,21 @@ def exec_shell(*commands: str):
 def make_init_files(path_iterator: PathIterator):
     for path in path_iterator:
         touch(path / "__init__.py")
+
+
+class ChangeLog:
+    def __init__(self):
+        self.changes = []
+
+    def new_item(self, item_name: str, item_version: str):
+        self.changes.append(f"New item created: `{item_name}` (version: `{item_version}`)")
+
+    def update_item(self, item_name: str, new_version: str, old_version: str):
+        self.changes.append(f"Item Updated: `{item_name}` (from version: `{old_version}` to `{new_version}`)")
+
+    def compile(self) -> str:
+        compiled = f"### Change log [{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}]\n"
+        for i, change in enumerate(self.changes):
+            compiled += f"{i}. {change}\n"
+        compiled += "\n"
+        return compiled

@@ -18,11 +18,8 @@ def unlink(paths: Union[str, List[str], PathIterator], ignore_errors: bool = Fal
 
 
 def copy_file(
-    source: str, target: str, unlink_target: bool = False, ignore_errors: bool = False,
+    source: Path, target: Path, unlink_target: bool = False, ignore_errors: bool = False,
 ):
-    source = Path(source)
-    target = Path(target)
-
     if not source.exists():
         if ignore_errors:
             return
@@ -41,7 +38,7 @@ def copy_file(
                     "Either set remove_target=True, to remove target before copy or resolve differences."
                 )
         else:
-            unlink(target)
+            unlink(str(target))
 
     try:
         if source.is_file():
