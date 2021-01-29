@@ -33,7 +33,7 @@ class BuildMarketplaceDocs:
 
         # For iterating target directories
         self.target_item_iterator = PathIterator(
-            path=self.target, rule=item_path_filter, recursive=False
+            path=self.target, suffix="latest", rule=item_path_filter, recursive=False
         )
 
     def build(self):
@@ -72,14 +72,9 @@ class BuildMarketplaceDocs:
         if not target_static.exists():
             copy_file(self.temp_docs / "_build/_static", target_static)
 
-        build_catalog_json(self.target_item_iterator, str(self.target))
-
-        rmtree(str(self.temp_docs))
-
-        # Render index.html
+        build_catalog_json(self.target_item_iterator, self.target)
         render_index(self.target_item_iterator, self.target)
         render_pages(self.target_item_iterator, self.target / "_static")
-
         copy_file(STATIC_DIR / "styles.css", self.target / "_static" / "styles.css")
 
         with open(self.target / "README.md", "w+") as f:
@@ -88,6 +83,8 @@ class BuildMarketplaceDocs:
             f.seek(0, 0)
             f.write(compiled_change_log)
             f.write(content)
+
+        rmtree(str(self.temp_docs))
 
 
 @dataclass
@@ -151,16 +148,22 @@ def update_html_resource_paths(html_path: Path, relative_path: str):
             new_html.write(str(parsed))
 
 
-def build_catalog_json(targets: PathIterator, target_path: str):
-    catalog_path = Path(target_path) / "catalog.json"
+def build_catalog_json(targets: PathIterator, target_path: Path):
+    catalog_path = target_path / "catalog.json"
     catalog = json.load(open(catalog_path, "r")) if catalog_path.exists() else {}
 
     for source_dir in targets:
-        item_yaml = source_dir / "item.yaml"
-        with open(item_yaml, "r") as yaml_file:
-            item = yaml.load(yaml_file)
-            if source_dir.name not in catalog:
-                catalog[source_dir.name] = item
+        source_yaml_path = source_dir / "item.yaml"
+        latest_yaml = yaml.load(open(source_yaml_path, "r"), yaml.FullLoader)
+        latest_version = latest_yaml["version"]
+        item_directory = source_dir.parent
+        catalog[item_directory.name] = {"latest": latest_yaml}
+        for version_dir in item_directory.iterdir():
+            version = version_dir.name
+            if version != "latest" and version != latest_version:
+                version_yaml_path = version_dir / "item.yaml"
+                version_yaml = yaml.load(open(version_yaml_path, "r"), yaml.FullLoader)
+                catalog[item_directory.name][version] = version_yaml
 
     json.dump(catalog, open(catalog_path, "w"))
 
@@ -168,8 +171,7 @@ def build_catalog_json(targets: PathIterator, target_path: str):
 def render_index(target_item_iterator: PathIterator, target_path: str):
     items = []
     for target in target_item_iterator:
-        item_path = target / "item.yaml"
-        item = yaml.load(open(str(item_path), "r"))
+        item = yaml.load(open(target / "item.yaml", "r"), yaml.FullLoader)
         item["name"] = item["name"].replace("-", " ").replace("_", " ").title()
         items.append(item)
 
@@ -237,10 +239,19 @@ class WebCategory:
 
 def render_pages(target_item_iterator: PathIterator, target_path: str):
     for target in target_item_iterator:
-        item = yaml.load(open(str(target / "item.yaml"), "r"))
+        target_yaml = target / "item.yaml"
+        item = yaml.load(open(target_yaml), yaml.FullLoader)
+        latest_version = item["version"]
+
         archive = {"current": item["version"], "prev": []}
-        for k, _ in item.get("archive", {}).items():
-            archive["prev"].append(k)
+
+        for version in target.iterdir():
+            if version.is_dir() and version.name != latest_version:
+                version_yaml = version / "item.yaml"
+                if version_yaml.exists():
+                    prev_item = yaml.load(open(version_yaml), yaml.FullLoader)
+                    archive["prev"].append(prev_item)
+
         render_jinja_file(
             TEMPLATES_DIR / "item.template",
             str(Path(target_path) / f"{item['name']}.html"),

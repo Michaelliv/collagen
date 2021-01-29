@@ -20,16 +20,19 @@ class PathIterator:
     def __init__(
         self,
         path: PathLike,
+        suffix: Optional[str] = None,
         rule: Optional[Callable[[Path], bool]] = None,
         recursive: bool = False,
     ) -> None:
         self.path = Path(path)
+        self.suffix = suffix
         self.rule = rule
         self.recursive = recursive
 
     def __iter__(self):
         iterator = self.path.rglob("*") if self.recursive else self.path.iterdir()
         for inner_path in iterator:
+            inner_path = inner_path / self.suffix if self.suffix else inner_path
             if self.rule is None:
                 yield inner_path
             elif self.rule(inner_path):
@@ -80,10 +83,14 @@ class ChangeLog:
         self.changes = []
 
     def new_item(self, item_name: str, item_version: str):
-        self.changes.append(f"New item created: `{item_name}` (version: `{item_version}`)")
+        self.changes.append(
+            f"New item created: `{item_name}` (version: `{item_version}`)"
+        )
 
     def update_item(self, item_name: str, new_version: str, old_version: str):
-        self.changes.append(f"Item Updated: `{item_name}` (from version: `{old_version}` to `{new_version}`)")
+        self.changes.append(
+            f"Item Updated: `{item_name}` (from version: `{old_version}` to `{new_version}`)"
+        )
 
     def compile(self) -> str:
         compiled = f"### Change log [{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}]\n"
