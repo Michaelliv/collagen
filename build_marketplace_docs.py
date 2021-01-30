@@ -77,12 +77,7 @@ class BuildMarketplaceDocs:
         render_pages(self.target_item_iterator, self.target / "_static")
         copy_file(STATIC_DIR / "styles.css", self.target / "_static" / "styles.css")
 
-        with open(self.target / "README.md", "w+") as f:
-            compiled_change_log = change_log.compile()
-            content = f.read()
-            f.seek(0, 0)
-            f.write(compiled_change_log)
-            f.write(content)
+        write_change_log(self.target / "README.md", change_log)
 
         rmtree(str(self.temp_docs))
 
@@ -297,4 +292,13 @@ def update_or_create_item(
     copy_file(html_path, target_latest / html_file_name)
     copy_file(html_path, target_version / html_file_name)
 
-    change_log.update_item(source_dir.stem, source_version, target_version.stem)
+    change_log.update_item(source_dir.stem, source_version, target_version.name)
+
+
+def write_change_log(readme: Path, change_log: ChangeLog):
+    content = open(readme, "r").read()
+    with open(readme, "w") as f:
+        if change_log.changes_available:
+            compiled_change_log = change_log.compile()
+            f.write(compiled_change_log)
+        f.write(content)
